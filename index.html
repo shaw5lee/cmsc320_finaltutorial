@@ -14577,6 +14577,10 @@ They provide the full dataset from these surveys, including questions about the 
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">sklearn</span> <span class="k">as</span> <span class="nn">sk</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
 
      </div>
@@ -14800,7 +14804,7 @@ There are a total of 5,945 cases in the dataset. Students were interviewed once 
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Looking at the results of the head() function, this dataset has 11,904 columns, which is far more than will be useful for a single exploratory data analysis project. In order to get a better idea as to what data I may look at, I skimmed the associated codebook, which gives a description for each column name.</p>
 <h2 id="3:-Exploratory-Data-Analysis-&amp;-Data-Visulation">3: Exploratory Data Analysis &amp; Data Visulation<a class="anchor-link" href="#3:-Exploratory-Data-Analysis-&amp;-Data-Visulation">&#182;</a></h2><h3 id="3.1-Total-Hours-Spent-Doing-Homework">3.1 Total Hours Spent Doing Homework<a class="anchor-link" href="#3.1-Total-Hours-Spent-Doing-Homework">&#182;</a></h3><p>I decided to first explore the hours of homework completed by 10th graders, since I feel like thsi could give good insight into attitudes about life and school.
-I plan to create a sum of all the homework hours per week across all subjects, adding 0 if there is a response of -99 (which according to the codebook, indicates that they did not take a respective course during that term) and recording if the data is blank (-98) or they did not participate in that question (-95). From this, I can look to see if there are any common outcomes predicted by the number of hours of homework each week.</p>
+I plan to create a sum of all the homework hours per week across all subjects, adding 0 if there is a response of -99 (which according to the codebook, indicates that they did not take a respective course during that term) and recording if the data is blank (-98), they did not participate in that question (-95), or the data was uncodable (-96). From this, I can look to see if there are any common outcomes predicted by the number of hours of homework each week.</p>
 <p>This code filters the table to only include columns which correspond to the appropriate codes for the number of hours of homework 
 reported by 10th graders.
 The first letter is either G or H, meaning that this includes the reponses from the 10th graders in the fall (G) and in the spring (H).
@@ -15032,7 +15036,7 @@ We also can double check that there is an appropriate number of columns; 25. Loo
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Although this filtered dataset contains considerably less data than the original dataset, it is still not easily interpreatble. 
-Because there are already so many columns in the filtered dataset, we can create a new dataframe which contains the case number (which allows cross-referencing between tables) and for now, the number of hours total spent per week across all subjects doing homework, the number of classes a student was taking, and the number of questions a student skipped or did not participate in.
+Because there are already so many columns in the filtered dataset, we can create a new dataframe which contains the case number (which allows cross-referencing between tables) and for now, the number of hours total spent per week across all subjects doing homework, the number of classes a student was taking, the number of noncodable questions, and the number of questions a student skipped or did not participate in.
 Including the information about why a question was not answered could potentially give insight into the accuracy of the conclusions of the data, and it may also allow a case to be excluded altogether if they did not participate in any of the questions (sum is 24 as there are 24 codes observed).
 This new dataframe could also be used later to store more statistics about a student. The number of classes could help determine an average time per class, or point to a student who has less hours because the given subjects do not describe their actual schedule well.</p>
 
@@ -15043,7 +15047,7 @@ This new dataframe could also be used later to store more statistics about a stu
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">statistics</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">,</span> <span class="s1">&#39;HOURSTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;SKIPS&#39;</span><span class="p">,</span> <span class="s1">&#39;NONPART&#39;</span><span class="p">,</span> <span class="s1">&#39;NUMENROLLED&#39;</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">statistics</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">,</span> <span class="s1">&#39;HOURSTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;SKIPS&#39;</span><span class="p">,</span> <span class="s1">&#39;NONPART&#39;</span><span class="p">,</span> <span class="s1">&#39;NONCOD&#39;</span><span class="p">,</span> <span class="s1">&#39;NUMENROLLED&#39;</span><span class="p">])</span>
 
 
 <span class="c1"># Getting the column names for the full tenth grade datset.</span>
@@ -15055,6 +15059,7 @@ This new dataframe could also be used later to store more statistics about a stu
     <span class="n">total_hours</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">skips</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">nonpart</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">non_code</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">num_enrolled</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># iterate over each column name in the dataframe</span>
@@ -15066,12 +15071,15 @@ This new dataframe could also be used later to store more statistics about a stu
         <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">95</span><span class="p">:</span>
             <span class="c1"># student did not participate in this question</span>
             <span class="n">nonpart</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">96</span><span class="p">:</span>
+            <span class="n">non_code</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">99</span><span class="p">:</span>
             <span class="n">num_enrolled</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">total_hours</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span>
+            <span class="n">total_hours</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">])</span>
         
-    <span class="n">statistics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">statistics</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">],</span> <span class="n">total_hours</span><span class="p">,</span> <span class="n">skips</span><span class="p">,</span> <span class="n">nonpart</span><span class="p">,</span> <span class="n">num_enrolled</span><span class="p">]</span>
+    <span class="n">statistics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">statistics</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">],</span> <span class="n">total_hours</span><span class="p">,</span> <span class="n">skips</span><span class="p">,</span> <span class="n">nonpart</span><span class="p">,</span> <span class="n">non_code</span><span class="p">,</span> <span class="n">num_enrolled</span><span class="p">]</span>
 
 <span class="n">statistics</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -15116,6 +15124,7 @@ This new dataframe could also be used later to store more statistics about a stu
       <th>HOURSTOTAL</th>
       <th>SKIPS</th>
       <th>NONPART</th>
+      <th>NONCOD</th>
       <th>NUMENROLLED</th>
     </tr>
   </thead>
@@ -15126,12 +15135,14 @@ This new dataframe could also be used later to store more statistics about a stu
       <td>10</td>
       <td>0</td>
       <td>0</td>
+      <td>0</td>
       <td>8</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1002</td>
       <td>19</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>8</td>
@@ -15142,6 +15153,7 @@ This new dataframe could also be used later to store more statistics about a stu
       <td>28</td>
       <td>1</td>
       <td>0</td>
+      <td>0</td>
       <td>9</td>
     </tr>
     <tr>
@@ -15151,11 +15163,13 @@ This new dataframe could also be used later to store more statistics about a stu
       <td>0</td>
       <td>24</td>
       <td>0</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>4</th>
       <td>1005</td>
       <td>8</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>10</td>
@@ -15183,7 +15197,7 @@ This new dataframe could also be used later to store more statistics about a stu
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This code selects the subset of the dataframe which meets the given condition: </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This code selects the subset of the dataframe which meets the given condition:</span>
 <span class="c1"># that NONPART is not 24, effectively removing any rows which do have a non-particpation count of 24.</span>
 <span class="n">statistics</span> <span class="o">=</span> <span class="n">statistics</span><span class="p">[</span><span class="n">statistics</span><span class="o">.</span><span class="n">NONPART</span> <span class="o">!=</span> <span class="mi">24</span><span class="p">]</span>
 
@@ -15230,6 +15244,7 @@ This new dataframe could also be used later to store more statistics about a stu
       <th>HOURSTOTAL</th>
       <th>SKIPS</th>
       <th>NONPART</th>
+      <th>NONCOD</th>
       <th>NUMENROLLED</th>
     </tr>
   </thead>
@@ -15240,12 +15255,14 @@ This new dataframe could also be used later to store more statistics about a stu
       <td>10</td>
       <td>0</td>
       <td>0</td>
+      <td>0</td>
       <td>8</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1002</td>
       <td>19</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>8</td>
@@ -15256,6 +15273,7 @@ This new dataframe could also be used later to store more statistics about a stu
       <td>28</td>
       <td>1</td>
       <td>0</td>
+      <td>0</td>
       <td>9</td>
     </tr>
     <tr>
@@ -15264,12 +15282,14 @@ This new dataframe could also be used later to store more statistics about a stu
       <td>8</td>
       <td>0</td>
       <td>0</td>
+      <td>0</td>
       <td>10</td>
     </tr>
     <tr>
       <th>6</th>
       <td>1007</td>
       <td>30</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>10</td>
@@ -15285,6 +15305,141 @@ This new dataframe could also be used later to store more statistics about a stu
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now that the data is a bit cleaned up, I'm interested in seeing some basic descriptive statistics about the number of hours students spend doing homework in total, which will help guide my further analysis.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">col</span> <span class="o">=</span> <span class="n">statistics</span><span class="p">[</span><span class="s1">&#39;HOURSTOTAL&#39;</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Count: </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Min: </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Max: </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mean: </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Median: </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Standard deviation: </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>count     5415
+unique     130
+top          8
+freq       202
+Name: HOURSTOTAL, dtype: int64
+
+Count: 5415
+Min: 0
+Max: 180
+Mean: 21.513388734995385
+Median: 18.0
+Standard deviation: 18.059749677824854
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This not only allows me to make sure I properly gathered data (i.e if the min is negative then I must have added the hour codes incorrectly), but also to remind myself what my data means.
+I looked at the mean of 21.5 hours of homework spent per week and felt that it was high. That was when I realized that the total number of hours of homework a week is over two semesters, so this mean is double what it would be on an actual given week.
+However, when predicting answers to other questions, this being realistically high is not important; it can still be a predictor, and students can be grouped by their mean hours over two as this would normalize the data in cases where a student may have a lot of work one semester but less the next, over the entire year having the same as other students.</p>
+<p>I'm curious to see if the data is skewed and if there are outliers, so I will make a boxplot with mathplotlib.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># the vert option specifies that the boxplot should *not* be vertical</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">vert</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of hours spent on homework&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Hours&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>Text(0.5, 0, &#39;Hours&#39;)</pre>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div class="jp-RenderedImage jp-OutputArea-output ">
+<img src="data:image/png;base64,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9PvSrGX79u3Z7XanLOtt2xvDXj3TXzwmJyczIvLkk09OILdt25ZAf1x2796dmZmdTmfKOGTmlP329n3yySfn5ORkbt++PScnJ/OII47ot9ftdvvj2muj0+nk+Ph4f3+ZmevXr+8fp94+tm3blt1uN1etWpWdTqe/vNdeb9thmn3pzTf32Zw/FDT707OQPixJUAOvAPYCezdu3LiwHlcNLco0b4sU1IfqdMMNNySQH/nIR2YM3YcyNYNp0Nn8gQMHstVqTdlXq9XqL+/VERH928125lpjbx+tVutBNUVEHjhwYGDd+/fvn/KOYNB+9+/fP7B/veUz1XnzzTcnkPv27Usg77nnninjcuDAgSmPs169mdlvvzk2+/bty1arlfv375/S117/Dhw40L9/r93meGfmwL716mqOy6D2hmn2pTff3Gdz/lDQ7E/PQvrADEG9aB8mZua7M/OkzDxp7dq1D7WthzSN0kOtfSkngCOPPBKAU089FYBzzz13YL/GxsbmPRa9P6RptaqH2ZYtW2i327TbbdatW0en06Hb7dJqtWi32+zZs4ctW7awbt06ADqdDlu2bGHPnj1s3LgRgHXr1rFp06b+7QceeKC/j952zX12Op1+H3vX45tt9LZptVps3LiRTZs2sWfPHlatWgXA+vXr2bhxI91ulx07drBp0ybGxsbYtGlTvy+bNm3q73fHjh10u91+fUB/206nA8Dy5cun1Nhz5plnEhH9Y3DhhRcC9Mdlz549/T716urtu7ff5tice+65bNmyhR07drBlyxa63W6/vW63y549e6bcv9PpsG7duv7+emPVO069fVx44YV0u11WrlxJp9PpL++119t2mGZfevPNfTbnDwXN/vQseh/m+ISewEsfB2e/I+Q1aq9Re436ofMa9VK28QsY1JlLH9ZQXStuXsoYtP60007LDRs29JeNjY311y10vzP1dVAdk5OTed55502pY77TQreNiDzttNMyswqC3vXrbrebEZGrV6/uj0mv9snJydy5c2f//sPq2bBhQ7Zarf78sHa73W6ed955U/Y/0+WlDRs2zDmcem0262i1Wv0+HGqa/VloH2YK6shZLhVExC7gFGANcDvwO5n53pm2Oemkk3Lv3r0ztjvD/h7y5YsFtXHxSrj4h0u/3wIcqnVLh5OIuCozTxq0btYLj5n5/MUvSZI0V/5l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
+"
+>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This boxplot shows that there are significant outliers to the data. Students do have the option on the survey to report doing up to 50 hours of homework a week for a single class, so the large outliers are possible.
+Knowing that there are these outliers means that in later data analysis, we may want to exclude those from that. (Outside of upper or lower fence = do not count).</p>
+
+</div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
