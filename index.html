@@ -15039,7 +15039,7 @@ We also can double check that there is an appropriate number of columns; 25. Loo
 <p>Although this filtered dataset contains considerably less data than the original dataset, it is still not easily interpreatble. 
 Because there are already so many columns in the filtered dataset, we can create a new dataframe which contains the case number (which allows cross-referencing between tables) and for now, the number of hours total spent per week across all subjects doing homework, the number of classes a student was taking, the number of noncodable questions, and the number of questions a student skipped or did not participate in.
 Including the information about why a question was not answered could potentially give insight into the accuracy of the conclusions of the data, and it may also allow a case to be excluded altogether if they did not participate in any of the questions (sum is 24 as there are 24 codes observed).<br>
-This new dataframe could also be used later to store more statistics about a student. The number of classes could help determine an average time per class, or point to a student who has less hours because the given subjects do not describe their actual schedule well.</p>
+This new dataframe could also be used later to store more esteem about a student. The number of classes could help determine an average time per class, or point to a student who has less hours because the given subjects do not describe their actual schedule well.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15619,6 +15619,171 @@ I would then potentially be able to try to see if there is a relationship betwee
       <td>4</td>
       <td>1</td>
       <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>In order to remove any non-answer values, I will repeat the code I used to look at the number of hours but this time for the self esteem questions. Furthermore, instead of summing all of the self esteem values, instead I will have a column which sums the number of positive values and the sum of negative values.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">esteem</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">,</span> <span class="s1">&#39;SUMPOS&#39;</span><span class="p">,</span> <span class="s1">&#39;SUMNEG&#39;</span><span class="p">,</span> <span class="s1">&#39;SKIPS&#39;</span><span class="p">,</span> <span class="s1">&#39;NONPART&#39;</span><span class="p">,</span> <span class="s1">&#39;NONCOD&#39;</span><span class="p">,</span> <span class="s1">&#39;RESP&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># Getting the column names for the full tenth grade datset.</span>
+<span class="c1"># The values at CASENUM are not answers to a question and is removed from this list</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">self_esteem</span><span class="p">)</span>
+<span class="n">columns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">self_esteem</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">spos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sneg</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">skips</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">nonpart</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">non_code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">responses</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># iterate over each column name in the dataframe</span>
+    <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">98</span><span class="p">:</span>
+            <span class="c1"># response is blank (no response)</span>
+            <span class="n">skips</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+        <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">95</span><span class="p">:</span>
+            <span class="c1"># student did not participate in this question</span>
+            <span class="n">nonpart</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">96</span><span class="p">:</span>
+            <span class="n">non_code</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">99</span><span class="p">:</span>
+            <span class="n">responses</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;^</span><span class="si">{</span><span class="n">rpos</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">spos</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;^</span><span class="si">{</span><span class="n">rneg</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sneg</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">code</span><span class="p">])</span>
+        
+    <span class="n">esteem</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">esteem</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">],</span> <span class="n">spos</span><span class="p">,</span> <span class="n">sneg</span><span class="p">,</span> <span class="n">skips</span><span class="p">,</span> <span class="n">nonpart</span><span class="p">,</span> <span class="n">non_code</span><span class="p">,</span> <span class="n">responses</span><span class="p">]</span>
+
+<span class="c1"># remove any rows where the case did not participate in any</span>
+<span class="n">esteem</span> <span class="o">=</span> <span class="n">esteem</span><span class="p">[</span><span class="n">esteem</span><span class="o">.</span><span class="n">NONPART</span> <span class="o">!=</span> <span class="mi">11</span><span class="p">]</span>
+
+<span class="n">esteem</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENUM</th>
+      <th>SUMPOS</th>
+      <th>SUMNEG</th>
+      <th>SKIPS</th>
+      <th>NONPART</th>
+      <th>NONCOD</th>
+      <th>RESP</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1001</td>
+      <td>5</td>
+      <td>7</td>
+      <td>5</td>
+      <td>0</td>
+      <td>0</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1002</td>
+      <td>13</td>
+      <td>16</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1003</td>
+      <td>10</td>
+      <td>20</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1005</td>
+      <td>10</td>
+      <td>20</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1007</td>
+      <td>16</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
     </tr>
   </tbody>
 </table>
