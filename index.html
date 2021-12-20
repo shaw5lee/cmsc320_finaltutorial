@@ -15455,6 +15455,185 @@ I would then potentially be able to try to see if there is a relationship betwee
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Looking at the codebook, the class of questions about self-opinion are denoted by the last three charcters, which are 29[A-L] (the codes skip F). These are the questions:</p>
+<ul>
+<li>A. Positive attitude toward self</li>
+<li>B. Good luck more important than work</li>
+<li>C. I am a person of worth</li>
+<li>D. Able to do things as well as others</li>
+<li>E. Try to get ahead; thwarted</li>
+<li>G. Plans hardly ever work out</li>
+<li>H. People who accept their conditions are happier</li>
+<li>I. Generally satisfied with self</li>
+<li>J. Wish I respected myself more</li>
+<li>K. We should leave tomorrow to take care of itself</li>
+<li>L. Feel I am a failure</li>
+</ul><p>There are positive and negative questions in this grouping, which will make it slightly more difficult to convert the data to something which is able to be used in mathematical models, but it will just take some manual noting.</p>
+<p>I have decided that A, C, D, H, I, and K are positive questions (where a lower number--denoting 'Strongly Agree', is better) and B, E, G, J, and L are negative questions (where a lower number is worse).</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The following code stores the regular expressions for positive questions and separately negative questions.</p>
+<p>It then creates a regular expression to filter the entire table by combining these with a format string, and uses that to, like with the hours of schoolwork, create a new dataframe with only the information about self-esteem and outlook on life.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rpos</span> <span class="o">=</span> <span class="s2">&quot;([GH]A29[ACDHIK])&quot;</span>
+<span class="n">rneg</span> <span class="o">=</span> <span class="s2">&quot;([GH]A29[BEGJL])&quot;</span>
+
+<span class="n">reg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;^</span><span class="si">{</span><span class="n">rpos</span><span class="si">}</span><span class="s1">|</span><span class="si">{</span><span class="n">rneg</span><span class="si">}</span><span class="s1">|(CASENUM)$&#39;</span>
+
+<span class="n">self_esteem</span> <span class="o">=</span> <span class="n">all_data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="n">reg</span><span class="p">))</span>
+<span class="n">self_esteem</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENUM</th>
+      <th>GA29A</th>
+      <th>GA29B</th>
+      <th>GA29C</th>
+      <th>GA29D</th>
+      <th>GA29E</th>
+      <th>GA29G</th>
+      <th>GA29H</th>
+      <th>GA29I</th>
+      <th>GA29J</th>
+      <th>GA29K</th>
+      <th>GA29L</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1001</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>-98</td>
+      <td>-98</td>
+      <td>-98</td>
+      <td>-98</td>
+      <td>-98</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1002</td>
+      <td>2</td>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>2</td>
+      <td>4</td>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1003</td>
+      <td>2</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1</td>
+      <td>2</td>
+      <td>4</td>
+      <td>2</td>
+      <td>2</td>
+      <td>4</td>
+      <td>2</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1004</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+      <td>-95</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1005</td>
+      <td>2</td>
+      <td>4</td>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>4</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Citations">Citations<a class="anchor-link" href="#Citations">&#182;</a></h2><p>[1] Miller, J. D. (2021). <em>Longitudinal Study of American Youth, 1987-1994, 2007-2011, 2014-2017</em> [Data set]. doi:10.3886/ICPSR30263.v7</p>
 <p>Inspiration for organization of page from <a href="https://summerzzzy.github.io/">https://summerzzzy.github.io/</a></p>
 
