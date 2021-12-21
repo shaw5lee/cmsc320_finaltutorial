@@ -14537,9 +14537,10 @@ a.anchor-link {
 <li>Exploratory Analysis & Data Visulation</li>
     <ul>
         <li>3.1 Total Hours Spent Doing Homework</li>
-        <li>3.2 Creating Hyptheses</li>
+        <li>3.2 Creating Hypotheses</li>
+        <li>3.3 Linear Regression</li>
     </ul>
-<li>Machine Learning Analysis</li>
+<li>Predictive Model Analysis</li>
 <li>Discussion of Findings</li>
 <li>Citations</li>
 </ol>
@@ -15683,7 +15684,7 @@ I would then potentially be able to try to see if there is a relationship betwee
         
     <span class="n">esteem</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">esteem</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">],</span> <span class="n">spos</span><span class="p">,</span> <span class="n">sneg</span><span class="p">,</span> <span class="n">skips</span><span class="p">,</span> <span class="n">nonpart</span><span class="p">,</span> <span class="n">non_code</span><span class="p">,</span> <span class="n">responses</span><span class="p">]</span>
 
-<span class="c1"># remove any rows where the case did not participate in any</span>
+<span class="c1"># remove any rows where the case did not participate in any questions</span>
 <span class="n">esteem</span> <span class="o">=</span> <span class="n">esteem</span><span class="p">[</span><span class="n">esteem</span><span class="o">.</span><span class="n">NONPART</span> <span class="o">!=</span> <span class="mi">11</span><span class="p">]</span>
 
 <span class="n">esteem</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -15790,6 +15791,437 @@ I would then potentially be able to try to see if there is a relationship betwee
 </div>
 </div>
 
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Unfortunately, a skipped question is a missing not at random (MNAR) variable. Because these are questions about mental health, some students may be too ashamed, scared that someone will see their responses, or unable to come to a decision about how they do feel.</p>
+<p>Because there are already so many datapoints, I want to try to drop any case where there is at least one skipped question.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">esteem</span> <span class="o">=</span> <span class="n">esteem</span><span class="p">[</span><span class="n">esteem</span><span class="o">.</span><span class="n">SKIPS</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="n">esteem</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENUM</th>
+      <th>SUMPOS</th>
+      <th>SUMNEG</th>
+      <th>SKIPS</th>
+      <th>NONPART</th>
+      <th>NONCOD</th>
+      <th>RESP</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>4648</td>
+      <td>4648</td>
+      <td>4648</td>
+      <td>4648</td>
+      <td>4648</td>
+      <td>4648</td>
+      <td>4648</td>
+    </tr>
+    <tr>
+      <th>unique</th>
+      <td>4648</td>
+      <td>26</td>
+      <td>21</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>top</th>
+      <td>1002</td>
+      <td>14</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>1</td>
+      <td>613</td>
+      <td>528</td>
+      <td>4648</td>
+      <td>4648</td>
+      <td>4587</td>
+      <td>4587</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>From the data given by describe, removing questions with where parts were skipped still leaves a lot of data, so I feel this is a reasonable approach to dealing with the MNAR variables. Including those in the analysis does not give a complete picture.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>There are 6 positive questions and only 5 negative questions, so this must be normalized. To do so, I am dividing the postive sums by 6 and the negative sums by 5. I then will add a new column which has the 'score', which is the positive normalized score less the negative normalized score.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">esteem</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">pos_norm</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">+</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;SUMPOS&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">6</span>
+    <span class="n">neg_norm</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">+</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;SUMNEG&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">5</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">pos_norm</span> <span class="o">-</span> <span class="n">neg_norm</span>
+
+    <span class="n">esteem</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;SCORE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+
+<span class="n">esteem</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENUM</th>
+      <th>SUMPOS</th>
+      <th>SUMNEG</th>
+      <th>SKIPS</th>
+      <th>NONPART</th>
+      <th>NONCOD</th>
+      <th>RESP</th>
+      <th>SCORE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>1002</td>
+      <td>13</td>
+      <td>16</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>-1.033333</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1003</td>
+      <td>10</td>
+      <td>20</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>-2.333333</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1005</td>
+      <td>10</td>
+      <td>20</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>-2.333333</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1007</td>
+      <td>16</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>-0.333333</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1008</td>
+      <td>11</td>
+      <td>19</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>-1.966667</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="3.3-Linear-Regression">3.3 Linear Regression<a class="anchor-link" href="#3.3-Linear-Regression">&#182;</a></h3><p>Now that we have numerical values that can be associated with an independent and dependent variable, a linear regression can be constructed.</p>
+<p>However first we need a table that is joined to have only values where both tables have the same case number. We can do this with an inner merge on casenum.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">regressiondat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">statistics</span><span class="p">,</span> <span class="n">esteem</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">)</span>
+
+<span class="n">regressiondat</span> <span class="o">=</span> <span class="n">regressiondat</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CASENUM&#39;</span><span class="p">,</span> <span class="s1">&#39;HOURSTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;SCORE&#39;</span><span class="p">])</span>
+
+<span class="n">regressiondat</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENUM</th>
+      <th>HOURSTOTAL</th>
+      <th>SCORE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1002</td>
+      <td>19</td>
+      <td>-1.033333</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1003</td>
+      <td>28</td>
+      <td>-2.333333</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1005</td>
+      <td>8</td>
+      <td>-2.333333</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1007</td>
+      <td>30</td>
+      <td>-0.333333</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1008</td>
+      <td>25</td>
+      <td>-1.966667</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">regressiondat</span><span class="p">[</span><span class="s1">&#39;HOURSTOTAL&#39;</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">regressiondat</span><span class="p">[</span><span class="s1">&#39;SCORE&#39;</span><span class="p">]</span>
+
+<span class="n">lreg</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----------Linear Regression Parameters------------&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lreg</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">lreg</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>----------Linear Regression Parameters------------
+x1   -0.034963
+dtype: float64
+                                 OLS Regression Results                                
+=======================================================================================
+Dep. Variable:                  SCORE   R-squared (uncentered):                   0.396
+Model:                            OLS   Adj. R-squared (uncentered):              0.396
+Method:                 Least Squares   F-statistic:                              3052.
+Date:                Mon, 20 Dec 2021   Prob (F-statistic):                        0.00
+Time:                        19:21:54   Log-Likelihood:                         -7503.8
+No. Observations:                4648   AIC:                                  1.501e+04
+Df Residuals:                    4647   BIC:                                  1.502e+04
+Df Model:                           1                                                  
+Covariance Type:            nonrobust                                                  
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+x1            -0.0350      0.001    -55.244      0.000      -0.036      -0.034
+==============================================================================
+Omnibus:                      491.205   Durbin-Watson:                   1.706
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              920.848
+Skew:                           0.702   Prob(JB):                    1.10e-200
+Kurtosis:                       4.669   Cond. No.                         1.00
+==============================================================================
+
+Notes:
+[1] R² is computed without centering (uncentered) since the model does not contain a constant.
+[2] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</pre>
+</div>
 </div>
 
 </div>
